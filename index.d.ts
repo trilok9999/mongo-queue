@@ -12,9 +12,14 @@ declare module 'mongo-queue' {
     export interface Record<T> {
       _id: ObjectID;
       receivedDate: Date;
-      status: 'received'|'processed'|'failed'|'skipped'|'notified'|'notifyFailure';
+      status: 'received' | 'processed' | 'failed' | 'skipped' | 'notified' | 'notifyFailure';
       available: Date;
       data: T;
+    }
+
+    export interface StatusCount {
+      status: string;
+      count: number;
     }
 
     export interface FailedRecord<T> extends Record<T> {
@@ -34,6 +39,8 @@ declare module 'mongo-queue' {
       backoffCoefficient?: number;
       onFailure?: (record: FailedRecord<T>) => PromiseLike<any> | undefined;
       continueProcessingOnError?: boolean;
+      statusesMonitorCron?: string;
+      onStatusesCheckProcess?: (statuses: [StatusCount]) => PromiseLike<any> | undefined;
     }
 
     export interface Identifiable {
@@ -41,14 +48,15 @@ declare module 'mongo-queue' {
     }
 
     export interface Queue<T> {
-      enqueue: (item: T) => PromiseLike<T&Identifiable>;
+      enqueue: (item: T) => PromiseLike<T & Identifiable>;
       processNextBatch: () => PromiseLike<void>;
       cleanup: () => PromiseLike<void>;
       resetRecords: (recordIDs: Array<string>) => PromiseLike<void>;
+      statusesCheck: () => PromiseLike<any>
     }
 
     export const skip: (delayMs: number) => any;
-    export const fail: (err: Error|string) => any;
+    export const fail: (err: Error | string) => any;
   }
 
 }
