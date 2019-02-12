@@ -31,6 +31,7 @@ declare module 'mongo-queue' {
       collectionName: string;
       processCron: string;
       onProcess: (record: Record<T>) => PromiseLike<any> | undefined;
+      onPreHook: PromiseLike<any> | undefined;
       cleanupCron?: string;
       batchSize?: number;
       maxRecordAge?: number;
